@@ -550,3 +550,88 @@ body {
   transform: translateY(-2px);
   box-shadow: 0 0 15px cyan;
 }
+/* Level */
+.level-up-overlay {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 2.2rem;
+  color: #ffe066;
+  background: rgba(0, 0, 0, 0.85);
+  padding: 1.2rem 2.5rem;
+  border-radius: 1.5rem;
+  border: 2px solid #0ff;
+  box-shadow: 0 0 15px #0ff;
+  z-index: 9999;
+  animation: level-up-popup 2.5s ease-in-out;
+}
+
+@keyframes level-up-popup {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -60%) scale(0.9);
+  }
+  10% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.05);
+  }
+  80% {
+    transform: translate(-50%, -50%) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -40%) scale(1.1);
+  }
+}
+.level-up-glow {
+  box-shadow: 0 0 20px 5px #0ff;
+  border: 2px solid #0ff;
+  animation: glow-blink 2s ease-in-out;
+}
+
+@keyframes glow-blink {
+  0%,
+  100% {
+    box-shadow: 0 0 5px #0ff;
+  }
+  50% {
+    box-shadow: 0 0 25px 10px #0ff;
+  }
+}
+
+/* Tương tác với AI */
+.reaction-bubble {
+  position: absolute;
+  top: 80px;
+  right: -80px;
+  transform: translateX(-50%);
+  background: #fff;
+  color: #333333;
+  padding: 6px 10px;
+  border-radius: 20px;
+  font-size: 14px;
+  white-space: nowrap;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+  animation: popInOut 3s ease-in-out;
+  z-index: 999;
+}
+
+@keyframes popInOut {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -10px);
+  }
+  10% {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+  90% {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -10px);
+  }
+}

@@ -1,6 +1,9 @@
 // game.js
 // Quản lý trò chơi, bao gồm logic trò chơi, AI và đồng hồ đếm ngược
 //import { getAIMove } from './ai.js';
+import { reactToPlayerMove, reactToAIMove } from './novaReaction.js';
+
+import { updateLevelDisplay } from './level.js';
 
 const boardSize = 15;
 const board = [];
@@ -54,6 +57,10 @@ function handleCellClick(e) {
   if (board[row][col] !== '') return;
 
   makeMove(row, col, currentPlayer);
+
+  /* Tương tác với người chơi */
+  reactToPlayerMove(board, [row, col], currentPlayer);
+  console.log('>> player move triggered');
 
   if (checkWin(row, col, currentPlayer)) {
     endGame(`🎉 Bạn thắng!`, 'player');
@@ -136,8 +143,10 @@ function endGame(message, winner) {
 
   if (winner === 'player') {
     playerWins++;
+    updateLevelDisplay(playerWins, aiWins);
   } else if (winner === 'ai') {
     aiWins++;
+    updateLevelDisplay(playerWins, aiWins);
   }
 
   updateScoreboard();
@@ -230,6 +239,10 @@ function runAI() {
     if (!gameOver && currentPlayer === 'O') {
       const [aiRow, aiCol] = window.getAIMove(board);
       makeMove(aiRow, aiCol, 'O');
+
+      /* Tương tác với AI */
+      reactToAIMove(board, [aiRow, aiCol], 'O');
+      console.log('>> ai move triggered');
 
       const index = aiRow * boardSize + aiCol;
       const cells = boardElement.querySelectorAll('.cell');

@@ -70,15 +70,15 @@ function updatePlayerInfo(playerName, aiName, aiAvatar) {
   const leftInfo = document.createElement('div');
   leftInfo.className = 'player-info player';
   leftInfo.innerHTML = `
-    <img src="assets/avatars/player.png" class="avatar" />
-    <div class="player-name">${playerName}<br><span class="level">Level 1</span></div>
+    <img src="assets/avatars/player.png" class="avatar" id="player-avatar" />
+    <div class="player-name">${playerName}<br><span id="player-level">Level 1</span></div>
   `;
 
   const rightInfo = document.createElement('div');
   rightInfo.className = 'player-info ai';
   rightInfo.innerHTML = `
-    <img src="${aiAvatar}" class="avatar" />
-    <div class="player-name">${aiName}<br><span class="level">Level 1</span></div>
+    <img src="${aiAvatar}" class="avatar" id="ai-avatar" />
+    <div class="player-name">${aiName}<br><span id="ai-level">Level 1</span></div>
   `;
 
   const timer = document.getElementById('timer');
