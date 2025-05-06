@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CaroNova - Chơi với AI</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.mobile.css" media="(max-width: 480px)" />
+</head>
+<body>
+
+  <!-- Bước 1: Menu chọn AI -->
+  <div id="ai-menu" class="overlay" style="display: flex; flex-direction: column; align-items: center; padding: 20px;">
+    <h1 class="game-title">CaroNova</h1>
+    <h2>Chọn đối thủ</h2>
+    <div class="ai-list" style="display: flex; gap: 20px; flex-wrap: wrap;">
+      <div class="ai-card selected" data-ai="basic" data-name="Meow" data-avatar="assets/avatars/meow.png">
+        <img src="assets/avatars/meow.png" alt="Meow AI" width="80" />
+        <h3>Meow ⚪</h3>
+        <p>Một chú mèo dễ thương đáng yêu.</p>
+      </div>
+      <div class="ai-card" data-ai="meow" data-name="Nova" data-avatar="assets/avatars/nova.png">
+        <img src="assets/avatars/nova.png" alt="Nova AI" width="80" />
+        <h3>Nova 🟡🔵</h3>
+        <p>Cô gái xinh đẹp đến từ tương lai.</p>
+      </div>
+    </div>
+    <button id="next-to-name-btn" style="margin-top: 20px;">Tiếp theo</button>
+  </div>
+
+<!-- Bước 2: Nhập tên người chơi -->
+<div id="name-input-overlay" class="overlay" style="display: none; flex-direction: column; align-items: center;">
+  <div class="name-card">
+    <h2 style="text-align: center; margin-bottom: 20px;">Nhập tên người chơi</h2>
+    <input type="text" id="player-name-input" placeholder="Tên của bạn..." maxlength="12" />
+    <button id="confirm-name-btn">Bắt đầu chơi</button>
+  </div>
+</div>
+
+
+  <!-- Giao diện chính của game -->
+  <div id="game-container" style="display: none;">
+    <h1 class="glow-title">CaroNova</h1>
+
+    <div class="board-controls">
+      <button id="reset-btn">🔄 Chơi lại</button>
+      <button id="reset-stats-btn">🧹 Reset</button>
+      <div id="timer">⏱️ 00:00</div>
+      <div id="status">--</div>
+      <div id="scoreboard">
+        🏆Thắng:<span id="player-wins">0</span> 
+        ❌Thua:<span id="player-losses">0</span> 
+      </div>
+      
+    </div>
+
+    <div id="turn-progress-wrapper">
+      <div id="turn-progress-bar"></div>
+    </div>
+
+    <div id="board" class="board"></div>
+    <div id="game-version" title="Phiên bản: CaroNova v1.0">ℹ️ v1.0</div>
+  </div>
+
+  <audio id="place-sound" src="assets/sounds/place.mp3" preload="auto"></audio>
+  <script type="module" src="js/menu.js"></script>
+</body>
+</html>
