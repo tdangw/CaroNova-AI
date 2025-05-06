@@ -41,12 +41,16 @@ export function getAIMove(board) {
       // Nếu không có nước đi nguy hiểm, tính điểm tấn công/phòng thủ
       const attackScore = evaluate(board, row, col, 'O') * 1.6;
       const defendScore = evaluate(board, row, col, 'X') * 1.2;
-      const nearBonus = isNearExistingMove(board, row, col) ? 5 : 0;
+      const nearBonus = isNearExistingMove(board, row, col) ? 10 : 0; // Tăng trọng số gần quân cờ
+      const centerBonus = Math.abs(row - size / 2) + Math.abs(col - size / 2) < size / 4 ? 10 : 0; // Ưu tiên trung tâm
+
+      // Giảm điểm nếu nước đi gần tường, nhưng chỉ áp dụng nếu không phải nước đi thắng hoặc chặn thắng
+      const wallPenalty = row <= 1 || row >= size - 2 || col <= 1 || col >= size - 2 ? -15 : 0;
 
       const moveKey = `${row},${col}`;
       const historyPenalty = moveHistory.has(moveKey) ? -10 : 0;
 
-      const total = attackScore + defendScore + nearBonus + historyPenalty;
+      const total = attackScore + defendScore + nearBonus + centerBonus + wallPenalty + historyPenalty;
 
       if (total > bestScore) {
         bestScore = total;
@@ -69,7 +73,7 @@ export function minimax(board, depth, isMaximizing, alpha, beta) {
   if (winner === 'X') return depth - 100; // Đối thủ thắng
   if (isBoardFull(board)) return 0; // Hòa
 
-  if (depth === 3) return evaluateBoard(board); // Giới hạn độ sâu
+  if (depth === 4) return evaluateBoard(board); // Tăng độ sâu lên 4
 
   if (isMaximizing) {
     let maxEval = -Infinity;

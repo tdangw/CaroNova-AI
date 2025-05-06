@@ -1,5 +1,5 @@
 import '../js/game.js';
-
+import { setCurrentAIName } from './novaReaction.js';
 let selectedAI = 'basic';
 
 const aiCards = document.querySelectorAll('.ai-card');
@@ -24,6 +24,7 @@ aiCards.forEach((card) => {
     aiCards.forEach((c) => c.classList.remove('selected'));
     card.classList.add('selected');
     selectedAI = card.dataset.ai;
+    console.log('[DEBUG] AI đang chọn:', selectedAI);
   });
 });
 
@@ -50,6 +51,8 @@ confirmBtn.addEventListener('click', async () => {
 
   const mod = await (selectedAI === 'meow' ? import('./ai-nova.js') : import('./ai.js'));
   window.getAIMove = mod.getAIMove;
+
+  setCurrentAIName(selectedAI); // Gọi đúng AI đang chọn
 
   nameOverlay.style.display = 'none';
   gameContainer.style.display = 'block';

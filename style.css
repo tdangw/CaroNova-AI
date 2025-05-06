@@ -604,17 +604,16 @@ body {
 .reaction-bubble {
   position: absolute;
   top: 80px;
-  right: -80px;
+  right: -520px;
   transform: translateX(-50%);
-  background: #fff;
-  color: #333333;
+  color: #00ff51;
+  text-shadow: 0 0 10px #ffea00;
   padding: 6px 10px;
   border-radius: 20px;
-  font-size: 14px;
+  font-size: 16px;
   white-space: nowrap;
-  box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
   animation: popInOut 3s ease-in-out;
-  z-index: 999;
+  z-index: 10;
 }
 
 @keyframes popInOut {
@@ -634,4 +633,10 @@ body {
     opacity: 0;
     transform: translate(-50%, -10px);
   }
+}
+/* Game start */
+.fade-out {
+  opacity: 0;
+  transition: opacity 2s ease;
+  pointer-events: none;
 }
