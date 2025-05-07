@@ -346,3 +346,13 @@ function createConfirmPopup() {
 
 createConfirmPopup();
 loadScoreboard();
+
+// Hiển thị thông tin phiên bản khi click vào biểu tượng
+document.getElementById('game-version')?.addEventListener('click', () => {
+  document.getElementById('version-info-popup')?.classList.remove('hidden');
+});
+
+// Đóng popup
+document.getElementById('close-version-popup')?.addEventListener('click', () => {
+  document.getElementById('version-info-popup')?.classList.add('hidden');
+});

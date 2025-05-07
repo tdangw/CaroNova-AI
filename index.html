@@ -10,23 +10,29 @@
 <body>
 
   <!-- Bước 1: Menu chọn AI -->
-  <div id="ai-menu" class="overlay" style="display: flex; flex-direction: column; align-items: center; padding: 20px;">
-    <h1 class="game-title">CaroNova</h1>
-    <h2>Chọn đối thủ</h2>
-    <div class="ai-list" style="display: flex; gap: 20px; flex-wrap: wrap;">
-      <div class="ai-card selected" data-ai="basic" data-name="Meow" data-avatar="assets/avatars/meow.png">
-        <img src="assets/avatars/meow.png" alt="Meow AI" width="80" />
-        <h3>Meow ⚪</h3>
-        <p>Một chú mèo dễ thương đáng yêu.</p>
-      </div>
-      <div class="ai-card" data-ai="nova" data-name="Nova" data-avatar="assets/avatars/nova.png">
-        <img src="assets/avatars/nova.png" alt="Nova AI" width="80" />
-        <h3>Nova 🟡🔵</h3>
-        <p>Cô gái xinh đẹp đến từ tương lai.</p>
-      </div>
+<div id="ai-menu" class="overlay" style="flex-direction: column; align-items: center; padding: 20px;">
+  <h1 class="game-title">CaroNova</h1>
+  <h2>Chọn đối thủ</h2>
+  <div class="ai-list">
+    <!-- Meow -->
+    <div class="ai-card selected" data-ai="basic" data-name="Meow" data-avatar="assets/avatars/meow.png">
+      <img src="assets/avatars/meow.png" alt="Meow AI" />
+      <h3>Meow ⚪</h3>
+      <p>Một chú mèo dễ thương đáng yêu.</p>
     </div>
-    <button id="next-to-name-btn" style="margin-top: 20px;">Tiếp theo</button>
+
+    <!-- Nova -->
+    <div class="ai-card" data-ai="nova" data-name="Nova" data-avatar="assets/avatars/nova.png">
+      <img src="assets/avatars/nova.png" alt="Nova AI" />
+      <h3>Nova 🟡🔵</h3>
+      <p>Cô gái xinh đẹp đến từ tương lai.</p>
+    </div>
+
+   
   </div>
+  <button id="next-to-name-btn" style="margin-top: 20px;">Tiếp theo</button>
+</div>
+
 
 <!-- Bước 2: Nhập tên người chơi -->
 <div id="name-input-overlay" class="overlay" style="display: none; flex-direction: column; align-items: center;">
@@ -59,7 +65,22 @@
     </div>
 
     <div id="board" class="board"></div>
-    <div id="game-version" title="Phiên bản: CaroNova v1.0">ℹ️ v1.1</div>
+    <div id="game-version" title="Phiên bản: CaroNova v1.1">ℹ️ v1.1</div>
+    <div id="version-info-popup" class="hidden version-popup">
+      <h3>Thông tin phiên bản v1.1</h3>
+      <ul>
+        <li>🧠 Nâng cấp AI.</li>
+        <li>🎤 Bật/tắt giọng AI tương tác.</li>
+        <li>🎯 Hệ thống tính điểm và level.</li>
+        <li>🎮 Lưu thống kê và hiển thị kết quả.</li>
+        <li>🔊 Cập nhật âm thanh.</li>
+        <li>😊 Cập nhật tương tác biểu cảm của AI.</li>
+        <li>🤖 AI nâng cao <b>- Coming soon!</b></li>
+        <li>🌐 Chế độ Online <b>- Coming soon!</b></li>
+      </ul>
+      <button id="close-version-popup">Đóng</button>
+    </div>
+    
   </div>
 
   <script type="module" src="js/menu.js"></script>
