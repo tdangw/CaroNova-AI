@@ -6,6 +6,15 @@ import { playSound } from './soundManager.js';
 
 import { updateLevelDisplay } from './level.js';
 
+function showResultOverlay(message = 'You win!') {
+  const overlay = document.createElement('div');
+  overlay.className = 'result-overlay';
+  overlay.innerHTML = `<span>${message}</span>`;
+  document.body.appendChild(overlay);
+
+  setTimeout(() => overlay.remove(), 2500);
+}
+
 const boardSize = 15;
 const board = [];
 let currentPlayer = 'X';
@@ -143,16 +152,16 @@ function endGame(message, winner) {
   clearInterval(turnTimerId);
 
   if (winner === 'player') {
-    playerWins++;
+    showResultOverlay('🏆 You win!');
     playSound('win');
-    // 🔊 Phát âm thanh thắng
-    updateLevelDisplay(playerWins, aiWins);
+    playerWins++;
   } else if (winner === 'ai') {
+    showResultOverlay('😿 You lose!');
+    playSound('lose');
     aiWins++;
-    playSound('lose'); // 🔊 Phát âm thanh thua
-    updateLevelDisplay(playerWins, aiWins);
   }
 
+  updateLevelDisplay(playerWins, aiWins);
   updateScoreboard();
   saveScoreboard();
 }
@@ -164,11 +173,18 @@ function updateTurnLabel(isPlayerTurn) {
 function updateScoreboard() {
   const winsEl = document.getElementById('player-wins');
   const lossesEl = document.getElementById('player-losses');
-  const timeEl = document.getElementById('player-time');
 
-  if (winsEl) winsEl.textContent = playerWins;
-  if (lossesEl) lossesEl.textContent = aiWins;
-  if (timeEl) timeEl.textContent = 300 - totalTime;
+  if (winsEl) {
+    winsEl.textContent = playerWins;
+    winsEl.classList.add('score-pop'); /* Thêm lớp CSS để tạo hiệu ứng */
+    setTimeout(() => winsEl.classList.remove('score-pop'), 300);
+  }
+
+  if (lossesEl) {
+    lossesEl.textContent = aiWins;
+    lossesEl.classList.add('score-pop'); /* Thêm lớp CSS để tạo hiệu ứng */
+    setTimeout(() => lossesEl.classList.remove('score-pop'), 300);
+  }
 }
 
 function saveScoreboard() {

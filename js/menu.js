@@ -26,12 +26,15 @@ aiCards.forEach((card) => {
     aiCards.forEach((c) => c.classList.remove('selected'));
     card.classList.add('selected');
     selectedAI = card.dataset.ai;
+    playSound('select'); // 🔊 phát âm thanh chọn AI
+
     console.log('[DEBUG] AI đang chọn:', selectedAI);
   });
 });
 
 // Tiếp theo → sang nhập tên
 nextBtn.addEventListener('click', () => {
+  playSound('selectButton'); // 🔊 phát âm thanh chọn nút
   aiMenu.style.display = 'none';
   nameOverlay.style.display = 'flex';
   autoFillLastUsedName();
@@ -75,6 +78,7 @@ function updatePlayerInfo(playerName, aiName, aiAvatar) {
   leftInfo.className = 'player-info player';
   leftInfo.innerHTML = `
     <img src="assets/avatars/player.png" class="avatar" id="player-avatar" />
+    <div class="player-reaction-box" id="player-reaction-box"></div>
     <div class="player-name">${playerName}<br><span id="player-level">Level 1</span></div>
   `;
 

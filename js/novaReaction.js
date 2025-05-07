@@ -261,7 +261,16 @@ export function reactToPlayerMove(board, move, symbol) {
   const [row, col] = move;
   if (Math.random() < 0.4) {
     const message = playerReactions[Math.floor(Math.random() * playerReactions.length)];
-    triggerReaction('player', message);
+    const box = document.getElementById('player-reaction-box');
+    if (box) {
+      box.textContent = message;
+      box.classList.add('show');
+
+      setTimeout(() => {
+        box.classList.remove('show');
+        box.textContent = '';
+      }, 3500);
+    }
   }
 }
 
@@ -283,7 +292,6 @@ function triggerReaction(who, message) {
   bubble.style.left = '150%';
   bubble.style.padding = '4px 8px';
   bubble.style.borderRadius = '12px';
-  bubble.style.fontSize = '13px';
   bubble.style.transition = 'opacity 0.3s ease';
   bubble.style.zIndex = '10';
 
@@ -292,5 +300,5 @@ function triggerReaction(who, message) {
   setTimeout(() => {
     bubble.style.opacity = '0';
     setTimeout(() => bubble.remove(), 300);
-  }, 3000);
+  }, 3500);
 }

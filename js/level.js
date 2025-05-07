@@ -41,7 +41,7 @@ export function showLevelUpOverlay(who, newLevel) {
 
   const overlay = document.createElement('div');
   overlay.className = 'level-up-overlay';
-  overlay.innerHTML = `<span>🎉 ${who} đã lên Level ${newLevel}!</span>`;
+  overlay.innerHTML = `<span> ${who} đã lên Level ${newLevel}!</span>`;
   document.body.appendChild(overlay);
 
   const avatarId = who === 'Player' ? 'player-avatar' : 'ai-avatar';

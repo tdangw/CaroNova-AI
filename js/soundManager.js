@@ -5,6 +5,8 @@ const sounds = {
   lose: new Audio('assets/sound/lose.mp3'),
   timeout: new Audio('assets/sound/timeout.mp3'),
   levelup: new Audio('assets/sound/levelup.mp3'),
+  select: new Audio('assets/sound/selectcard.mp3'),
+  selectButton: new Audio('assets/sound/select.mp3'),
 };
 
 Object.values(sounds).forEach((audio) => {
