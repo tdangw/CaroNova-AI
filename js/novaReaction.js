@@ -241,7 +241,6 @@ export function reactToAIMove(board, move, symbol) {
   if (Math.random() < 0.6) {
     let reactions = [];
 
-    // Mapping logic: 'basic' = Meow, 'nova' = Nova
     switch (currentAIName) {
       case 'nova':
         reactions = novaReactions;
@@ -253,6 +252,11 @@ export function reactToAIMove(board, move, symbol) {
 
     const message = reactions[Math.floor(Math.random() * reactions.length)];
     triggerReaction('ai', message);
+
+    // ✅ Chỉ nói nếu đã bật giọng
+    if (window.isVoiceEnabled) {
+      speakAI(message);
+    }
   }
 }
 
@@ -302,3 +306,25 @@ function triggerReaction(who, message) {
     setTimeout(() => bubble.remove(), 300);
   }, 3500);
 }
+
+/* Test AI nói */
+function speakAI(text) {
+  if (!window.speechSynthesis || !window.isVoiceEnabled) return;
+
+  // Bỏ emoji và ký tự đặc biệt, chỉ giữ lại chữ và số
+  const cleanText = text.replace(/[^\p{L}\p{N}\s]/gu, '').trim();
+
+  if (!cleanText) return; // Nếu chỉ còn trống thì không nói
+
+  const utter = new SpeechSynthesisUtterance(cleanText);
+  utter.lang = 'vi-VN';
+  utter.pitch = 1.3;
+  utter.rate = 1.05;
+  utter.volume = 0.9;
+
+  window.speechSynthesis.cancel();
+  window.speechSynthesis.speak(utter);
+}
+speechSynthesis.getVoices().forEach((voice, index) => {
+  console.log(`${index}: ${voice.name} [${voice.lang}] ${voice.default ? '(default)' : ''}`);
+});

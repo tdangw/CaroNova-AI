@@ -159,6 +159,13 @@ function endGame(message, winner) {
     showResultOverlay('😿 You lose!');
     playSound('lose');
     aiWins++;
+
+    setTimeout(() => {
+      const overlay = document.querySelector('.result-overlay'); // Lấy overlay vừa tạo làm hiếu ứng player thua
+      if (overlay && overlay.textContent.includes('You lose')) {
+        overlay.classList.add('player-lose');
+      }
+    }, 50);
   }
 
   updateLevelDisplay(playerWins, aiWins);

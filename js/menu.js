@@ -98,3 +98,20 @@ function updatePlayerInfo(playerName, aiName, aiAvatar) {
   wrapper.prepend(leftInfo);
   wrapper.append(rightInfo);
 }
+/* Thử nghiệm giọng nói AI */
+let isVoiceEnabled = false;
+
+window.isVoiceEnabled = false; // Để các file khác có thể truy cập
+
+const voiceIcon = document.createElement('div');
+voiceIcon.id = 'voice-toggle-icon';
+voiceIcon.title = 'Bật/Tắt giọng AI';
+voiceIcon.innerText = '🎤'; // có thể thay icon ảnh nếu cần
+document.body.appendChild(voiceIcon);
+
+voiceIcon.addEventListener('click', () => {
+  isVoiceEnabled = !isVoiceEnabled;
+  window.isVoiceEnabled = isVoiceEnabled; // ✅ cập nhật biến toàn cục
+  voiceIcon.classList.toggle('active', isVoiceEnabled);
+  if (!isVoiceEnabled) window.speechSynthesis.cancel();
+});
