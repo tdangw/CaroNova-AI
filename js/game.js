@@ -2,6 +2,7 @@
 // Quản lý trò chơi, bao gồm logic trò chơi, AI và đồng hồ đếm ngược
 //import { getAIMove } from './ai.js';
 import { reactToPlayerMove, reactToAIMove } from './novaReaction.js';
+import { playSound } from './soundManager.js';
 
 import { updateLevelDisplay } from './level.js';
 
@@ -19,7 +20,7 @@ const turnProgress = document.getElementById('turn-progress-bar');
 let playerWins = 0;
 let aiWins = 0;
 
-let totalTime = 300;
+let totalTime = 600;
 let turnTime = 30;
 let totalTimerId = null;
 let turnTimerId = null;
@@ -143,9 +144,12 @@ function endGame(message, winner) {
 
   if (winner === 'player') {
     playerWins++;
+    playSound('win');
+    // 🔊 Phát âm thanh thắng
     updateLevelDisplay(playerWins, aiWins);
   } else if (winner === 'ai') {
     aiWins++;
+    playSound('lose'); // 🔊 Phát âm thanh thua
     updateLevelDisplay(playerWins, aiWins);
   }
 
@@ -192,10 +196,24 @@ function resetTimers() {
 
   let turnRemaining = turnTime;
   turnProgress.style.width = '100%';
+  turnProgress.classList.remove('warning', 'danger'); // Reset màu
 
+  // Đếm ngược thời gian mỗi lượt
   turnTimerId = setInterval(() => {
     turnRemaining--;
     turnProgress.style.width = `${(turnRemaining / turnTime) * 100}%`;
+
+    // Cập nhật màu cảnh báo
+    turnProgress.classList.remove('warning', 'danger');
+    if (turnRemaining <= 10) {
+      if (turnRemaining === 10) {
+        playSound('timeout'); // 🔊 Phát âm thanh cảnh báo còn 10s
+      }
+
+      turnProgress.classList.add('danger');
+    } else if (turnRemaining <= 20) {
+      turnProgress.classList.add('warning');
+    }
 
     if (turnRemaining <= 0) {
       clearInterval(turnTimerId);
@@ -203,6 +221,7 @@ function resetTimers() {
     }
   }, 1000);
 
+  // Đếm ngược tổng thời gian ván
   totalTimerId = setInterval(() => {
     totalTime--;
     updateTotalTimer();
@@ -232,7 +251,7 @@ function handleTurnTimeout() {
 }
 
 function runAI() {
-  const aiThinkTime = Math.floor(Math.random() * 300) + 600;
+  const aiThinkTime = Math.floor(Math.random() * 300) + 300; // Thời gian suy nghĩ của AI (300ms - 600ms)
   resetTimers();
 
   setTimeout(() => {
@@ -266,7 +285,7 @@ function runAI() {
 }
 
 resetBtn.addEventListener('click', () => {
-  totalTime = 300;
+  totalTime = 600;
   window.createBoard();
 });
 

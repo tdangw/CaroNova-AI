@@ -151,8 +151,8 @@ body {
 #turn-progress-bar {
   height: 100%;
   width: 100%;
-  background: linear-gradient(to right, #00e6e6, #00bfff);
-  transition: width 1s linear;
+  background-color: #00e6e6;
+  transition: width 1s linear, background-color 0.5s ease;
 }
 
 /* ========== VERSION ========== */
@@ -347,13 +347,13 @@ body {
 .player-info.player {
   position: relative;
   left: 2px;
-  top: 70px;
+  top: 60px;
   z-index: 2;
 }
 
 .player-info.ai {
   position: relative;
-  top: -80px;
+  top: -90px;
   left: 534px;
   z-index: 2;
 }
@@ -603,7 +603,7 @@ body {
 /* Tương tác với AI */
 .reaction-bubble {
   position: absolute;
-  top: 80px;
+  top: 98px;
   right: -520px;
   transform: translateX(-50%);
   color: #00ff51;
@@ -639,4 +639,12 @@ body {
   opacity: 0;
   transition: opacity 2s ease;
   pointer-events: none;
+}
+/* Thời gian */
+#turn-progress-bar.warning {
+  background-color: #f1c40f; /* Vàng */
+}
+
+#turn-progress-bar.danger {
+  background-color: #e74c3c; /* Đỏ */
 }

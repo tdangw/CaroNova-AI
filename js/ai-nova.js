@@ -21,26 +21,26 @@ export function getAIMove(board) {
         return [row, col]; // Ưu tiên đánh thắng ngay
       }
 
-      // Kiểm tra nước đi chặn đối thủ thắng ngay lập tức
-      if (isWinningMove(board, row, col, 'X')) {
-        return [row, col]; // Ưu tiên chặn đối thủ thắng
-      }
-
-      // Kiểm tra nước đi nguy hiểm (combo 2+2 = 5 hoặc đường 3 quân nguy hiểm)
-      const threatLevel = isThreatMove(board, row, col, 'X');
-      if (threatLevel > 0) {
-        return [row, col]; // Ưu tiên chặn nước đi nguy hiểm
-      }
-
-      // Kiểm tra nước đi có thể dẫn đến chiến thắng nhanh hơn
+      // Kiểm tra nước đi nối các đường 3-4 để thắng
       const potentialWin = evaluatePotentialWin(board, row, col, 'O');
       if (potentialWin > 0) {
         return [row, col]; // Ưu tiên nước đi dẫn đến chiến thắng nhanh hơn
       }
 
+      // Kiểm tra nước đi chặn đối thủ thắng ngay lập tức
+      if (isWinningMove(board, row, col, 'X')) {
+        return [row, col]; // Ưu tiên chặn đối thủ thắng
+      }
+
+      // Kiểm tra nước đi chặn các đường nguy hiểm của đối thủ
+      const threatLevel = isThreatMove(board, row, col, 'X');
+      if (threatLevel > 0) {
+        return [row, col]; // Ưu tiên chặn nước đi nguy hiểm
+      }
+
       // Nếu không có nước đi nguy hiểm, tính điểm tấn công/phòng thủ
-      const attackScore = evaluate(board, row, col, 'O') * 1.6;
-      const defendScore = evaluate(board, row, col, 'X') * 1.2;
+      const attackScore = evaluate(board, row, col, 'O') * 1.8; // Tăng trọng số tấn công
+      const defendScore = evaluate(board, row, col, 'X') * 1.5; // Tăng trọng số phòng thủ
       const nearBonus = isNearExistingMove(board, row, col) ? 10 : 0; // Tăng trọng số gần quân cờ
       const centerBonus = Math.abs(row - size / 2) + Math.abs(col - size / 2) < size / 4 ? 10 : 0; // Ưu tiên trung tâm
 

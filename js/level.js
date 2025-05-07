@@ -1,9 +1,11 @@
 // level.js - Quản lý cấp độ người chơi và AI
 
+import { playSound } from './soundManager.js';
+
 export let gameState = {
   lastPlayerLevel: 1,
   lastAILevel: 1,
-  initialized: false, // ✅ Thêm cờ tránh hiện popup sai khi tải trang
+  initialized: false,
 };
 
 export function updateLevelDisplay(playerWins, playerLosses) {
@@ -16,7 +18,6 @@ export function updateLevelDisplay(playerWins, playerLosses) {
   if (playerLevelEl) playerLevelEl.textContent = `Level ${playerLevel}`;
   if (aiLevelEl) aiLevelEl.textContent = `Level ${aiLevel}`;
 
-  // ✅ Ngăn hiển thị hiệu ứng khi vừa tải lại trang
   if (!gameState.initialized) {
     gameState.lastPlayerLevel = playerLevel;
     gameState.lastAILevel = aiLevel;
@@ -36,12 +37,13 @@ export function updateLevelDisplay(playerWins, playerLosses) {
 }
 
 export function showLevelUpOverlay(who, newLevel) {
+  playSound('levelup'); // 🔊 Gọi ngay trong overlay (giữ hiệu ứng đồng bộ)
+
   const overlay = document.createElement('div');
   overlay.className = 'level-up-overlay';
   overlay.innerHTML = `<span>🎉 ${who} đã lên Level ${newLevel}!</span>`;
   document.body.appendChild(overlay);
 
-  // ⭐️ Thêm hiệu ứng sáng cho avatar tương ứng
   const avatarId = who === 'Player' ? 'player-avatar' : 'ai-avatar';
   const avatar = document.getElementById(avatarId);
   if (avatar) {

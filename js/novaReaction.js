@@ -241,9 +241,9 @@ export function reactToAIMove(board, move, symbol) {
   if (Math.random() < 0.6) {
     let reactions = [];
 
-    // Mapping logic: 'basic' = Meow, 'meow' = Nova
+    // Mapping logic: 'basic' = Meow, 'nova' = Nova
     switch (currentAIName) {
-      case 'meow':
+      case 'nova':
         reactions = novaReactions;
         break;
       case 'basic':

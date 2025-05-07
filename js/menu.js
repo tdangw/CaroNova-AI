@@ -1,5 +1,7 @@
 import '../js/game.js';
 import { setCurrentAIName } from './novaReaction.js';
+import { playSound } from './soundManager.js';
+
 let selectedAI = 'basic';
 
 const aiCards = document.querySelectorAll('.ai-card');
@@ -37,36 +39,35 @@ nextBtn.addEventListener('click', () => {
 
 // Bắt đầu game
 confirmBtn.addEventListener('click', async () => {
-  let name = playerNameInput.value.trim();
-  if (!name) name = 'Player';
+  playSound('gameStart'); // 🔊 Phát nhạc bắt đầu
+  nameOverlay.classList.add('fade-out'); // Thêm hiệu ứng mờ dần
 
-  const selectedCard = document.querySelector('.ai-card.selected');
-  const aiName = selectedCard.dataset.name;
-  const aiAvatar = selectedCard.dataset.avatar;
+  setTimeout(async () => {
+    nameOverlay.style.display = 'none';
+    gameContainer.style.display = 'block';
 
-  localStorage.setItem('playerName', name);
-  localStorage.setItem('selectedAI', selectedAI);
-  localStorage.setItem('aiName', aiName);
-  localStorage.setItem('aiAvatar', aiAvatar);
+    let name = playerNameInput.value.trim();
+    if (!name) name = 'Player';
 
-  const mod = await (selectedAI === 'meow' ? import('./ai-nova.js') : import('./ai.js'));
-  window.getAIMove = mod.getAIMove;
+    const selectedCard = document.querySelector('.ai-card.selected');
+    const aiName = selectedCard.dataset.name;
+    const aiAvatar = selectedCard.dataset.avatar;
 
-  setCurrentAIName(selectedAI); // Gọi đúng AI đang chọn
+    localStorage.setItem('playerName', name);
+    localStorage.setItem('selectedAI', selectedAI);
+    localStorage.setItem('aiName', aiName);
+    localStorage.setItem('aiAvatar', aiAvatar);
 
-  nameOverlay.style.display = 'none';
-  gameContainer.style.display = 'block';
+    const mod = await (selectedAI === 'nova' ? import('./ai-nova.js') : import('./ai.js'));
+    window.getAIMove = mod.getAIMove;
 
-  updatePlayerInfo(name, aiName, aiAvatar);
-  window.createBoard();
-  const placeSound = document.getElementById('place-sound');
-  if (placeSound) {
-    // Chỉ gán hàm vào global để dùng về sau
-    window.playPlaceSound = () => {
-      placeSound.currentTime = 0;
-      placeSound.play().catch(() => {});
-    };
-  }
+    setCurrentAIName(selectedAI);
+
+    updatePlayerInfo(name, aiName, aiAvatar);
+    window.createBoard();
+
+    window.playPlaceSound = () => playSound('place'); // 🔊 Phát âm thanh khi đặt quân
+  }, 2000);
 });
 
 function updatePlayerInfo(playerName, aiName, aiAvatar) {
