@@ -5,6 +5,26 @@ let currentAIName = 'nova'; // AI mặc định
 export function setCurrentAIName(name) {
   currentAIName = name.toLowerCase();
 }
+// Danh sách phản ứng của Zeta (thông minh, lạnh lùng)
+const zetaReactions = [
+  'Zeta bắt đầu tăng tốc rồi đây ⚡',
+  'Chiến thuật tấn công tối đa! 🔥',
+  'Bạn có né được nước tiếp theo của Zeta không? 😈',
+  'Zeta không đùa đâu nha 💥',
+  'Chuỗi tấn công khởi động 🚀',
+  'Zeta không chờ – Zeta hành động 🧠⚔️',
+  'Cảm nhận áp lực chưa? Zeta mới bắt đầu thôi 😏',
+];
+// Danh sách phản ứng của Lumi (dễ thương, thông minh)
+const lumiReactions = [
+  'Lumi sẽ bảo vệ bàn cờ này 🛡️',
+  'Đừng vội, Lumi luôn bình tĩnh 🤍',
+  'Nước đi này không dễ vượt qua đâu 😇',
+  'Bạn đang thử thách Lumi sao? 😌',
+  'Chiến thuật phản công bắt đầu 💫',
+  'Lumi không vội – Lumi quan sát kỹ từng nước ♟️',
+  'Cẩn thận, Lumi đã phân tích xong rồi 📊',
+];
 
 // Danh sách phản ứng của Nova (ngầu, cà khịa)
 const novaReactions = [
@@ -240,10 +260,16 @@ export function reactToAIMove(board, move, symbol) {
   const [row, col] = move;
   if (Math.random() < 0.6) {
     let reactions = [];
-
+    // Chọn mô hình AI để tương tác
     switch (currentAIName) {
       case 'nova':
         reactions = novaReactions;
+        break;
+      case 'zeta':
+        reactions = zetaReactions;
+        break;
+      case 'lumi':
+        reactions = lumiReactions;
         break;
       case 'basic':
       default:

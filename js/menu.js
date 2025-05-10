@@ -61,8 +61,28 @@ confirmBtn.addEventListener('click', async () => {
     localStorage.setItem('aiName', aiName);
     localStorage.setItem('aiAvatar', aiAvatar);
 
-    const mod = await (selectedAI === 'nova' ? import('./ai-nova.js') : import('./ai.js'));
+    // Gọi AI tương ứng
+    let aiModulePath;
+    switch (selectedAI) {
+      case 'nova':
+        aiModulePath = './ai-nova.js';
+        break;
+      case 'zeta':
+        aiModulePath = './ai-zeta.js';
+        break;
+      case 'lumi':
+        aiModulePath = './ai-lumi.js';
+        break;
+      case 'online':
+        showOnlineRoomOverlay(); // xử lý online riêng nếu có
+        return; // không cần load AI local
+      default:
+        aiModulePath = './ai.js'; // basic: Meow
+    }
+
+    const mod = await import(aiModulePath);
     window.getAIMove = mod.getAIMove;
+    // Gọi hàm khởi tạo AI nếu có
 
     setCurrentAIName(selectedAI);
 
@@ -105,8 +125,9 @@ window.isVoiceEnabled = false; // Để các file khác có thể truy cập
 
 const voiceIcon = document.createElement('div');
 voiceIcon.id = 'voice-toggle-icon';
-voiceIcon.title = 'Bật/Tắt giọng AI';
-voiceIcon.innerText = '🎤'; // có thể thay icon ảnh nếu cần
+voiceIcon.className = 'tooltip';
+voiceIcon.dataset.tooltip = 'Bật/Tắt giọng nói AI (AI sẽ phản hồi bằng lời nói nếu bật)';
+voiceIcon.innerText = '🎤';
 document.body.appendChild(voiceIcon);
 
 voiceIcon.addEventListener('click', () => {
@@ -115,3 +136,28 @@ voiceIcon.addEventListener('click', () => {
   voiceIcon.classList.toggle('active', isVoiceEnabled);
   if (!isVoiceEnabled) window.speechSynthesis.cancel();
 });
+
+// Thông báo cho chế độ online - tạm thời không có AI
+function showOnlineRoomOverlay() {
+  // Xóa overlay cũ nếu có
+  const old = document.getElementById('online-overlay');
+  if (old) old.remove();
+
+  // Tạo overlay
+  const overlay = document.createElement('div');
+  overlay.id = 'online-overlay';
+  overlay.className = 'overlay-message';
+  overlay.innerHTML = `
+    <div class="overlay-box">
+      <h2>🔧 Chế độ Online đang được phát triển!</h2>
+      <p>Vui lòng quay lại sau để trải nghiệm phiên bản hoàn chỉnh.</p>
+      <button id="back-to-menu">Quay về Menu</button>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+
+  // Nút quay về
+  document.getElementById('back-to-menu').addEventListener('click', () => {
+    location.reload(); // Tải lại toàn bộ trang
+  });
+}

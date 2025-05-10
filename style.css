@@ -325,7 +325,7 @@ body {
 
 .ai-card {
   border: 2px solid transparent;
-  padding: 15px;
+  padding: 10px;
   border-radius: 10px;
   background-color: rgba(255, 255, 255, 0.05);
   color: white;
@@ -349,7 +349,7 @@ body {
   height: 100px;
   object-fit: cover;
   border-radius: 10px;
-  margin-bottom: 10px;
+  margin-bottom: 0px;
 }
 
 #start-game-btn {
@@ -807,4 +807,168 @@ body {
 
 .hidden {
   display: none;
+}
+
+/* toltip */
+.tooltip:hover::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 120%;
+  right: 0;
+  transform: translateX(-10%);
+  background: rgba(0, 0, 0, 0.85);
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 8px;
+  white-space: nowrap;
+  font-size: 13px;
+  font-weight: 400;
+  opacity: 0;
+  animation: fadeInTooltip 0.3s forwards;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+  pointer-events: none;
+  z-index: 1000;
+}
+
+.tooltip:hover::before {
+  content: '';
+  position: absolute;
+  bottom: 110%;
+  right: 14px;
+  border-width: 6px;
+  border-style: solid;
+  border-color: transparent transparent rgba(0, 0, 0, 0.85) transparent;
+  opacity: 0;
+  animation: fadeInTooltip 0.3s forwards;
+  pointer-events: none;
+  z-index: 1000;
+}
+
+@keyframes fadeInTooltip {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+/* Thông báo tạm thời cho chế độ online */
+.overlay-message {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(10, 10, 30, 0.9);
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.overlay-box {
+  background: #1a1a2e;
+  padding: 30px;
+  border-radius: 12px;
+  text-align: center;
+  box-shadow: 0 0 15px #00ffff66;
+  max-width: 480px;
+}
+
+.overlay-box button {
+  margin-top: 20px;
+  padding: 10px 20px;
+  background: #00ffff33;
+  border: none;
+  border-radius: 8px;
+  color: white;
+  cursor: pointer;
+}
+
+.overlay-box button:hover {
+  background: #00ffff88;
+}
+
+/* Thông báo tạm thời cho chế độ online */
+
+/* Lật card */
+.ai-card {
+  width: 180px;
+  height: 240px;
+  perspective: 1000px;
+  cursor: pointer;
+  position: relative;
+  border: 2px solid transparent;
+  border-radius: 10px;
+  background-color: rgba(255, 255, 255, 0.05);
+  transition: border 0.3s, box-shadow 0.3s;
+}
+
+.card-inner {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.6s ease;
+}
+
+/* ✅ Card luôn lật khi hover */
+.ai-card:hover .card-inner {
+  transform: rotateY(180deg);
+}
+
+/* ✅ Card được chọn: chỉ phát sáng – KHÔNG ảnh hưởng flip */
+.ai-card.selected {
+  border: 2px solid #0ff;
+  box-shadow: 0 0 10px #0ff;
+}
+
+/* Mặt trước và sau */
+.card-front,
+.card-back {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  border-radius: 10px;
+  padding: 15px;
+  box-sizing: border-box;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.card-front img {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  margin-bottom: 10px;
+  border-radius: 8px;
+}
+
+/* Mặt sau */
+.card-back {
+  transform: rotateY(180deg);
+  background-color: #1e2b3a;
+  position: absolute;
+  top: -10px;
+  left: -10px;
+  width: calc(100% + 20px);
+  height: calc(100% + 20px);
+  border-radius: 12px;
+  backface-visibility: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  z-index: 2;
+  padding: 20px;
+  box-sizing: border-box;
 }

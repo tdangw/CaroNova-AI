@@ -1,179 +1,162 @@
-// ai-nova.js
-// AI nâng cao với điểm tấn công, phòng thủ và gần quân
-// AI Nova nâng cấp: tấn công mạnh, phòng thủ tốt, ưu tiên ô gần quân cờ đã đánh
+// ai-nova.js - AI nâng cấp cho CaroNova (ưu tiên tấn công, chặn thông minh)
 
-// Lưu trữ lịch sử các nước đi
-const moveHistory = new Set();
-const gameHistory = [];
-
-// Hàm lấy nước đi của AI
 export function getAIMove(board) {
+  const aiSymbol = 'O';
+  const playerSymbol = 'X';
+
+  // 1. Thắng ngay nếu có thể
+  const winNow = findWinningMove(board, aiSymbol);
+  if (winNow) return winNow;
+
+  // 2. Chặn thắng ngay của đối thủ
+  const blockWin = findWinningMove(board, playerSymbol);
+  if (blockWin) return blockWin;
+
+  // 3. Chặn combo 3 mở đôi nguy hiểm (double threat)
+  const threat = findDoubleThreat(board, playerSymbol);
+  if (threat) return threat;
+
+  // 4. Tạo chuỗi 4 của mình nếu có
+  const attack4 = findLineLength(board, aiSymbol, 4);
+  if (attack4) return attack4;
+
+  // 5. Tạo combo 3 mở đôi để ép đối phương
+  const attack3 = findDoubleThreat(board, aiSymbol);
+  if (attack3) return attack3;
+
+  // 6. Heuristic fallback nếu không có nước rõ ràng
+  return findBestHeuristicMove(board, aiSymbol);
+}
+
+// =======================================
+// ==== PHẦN HỖ TRỢ CHIẾN LƯỢC THÔNG MINH ====
+// =======================================
+
+function findWinningMove(board, symbol) {
   const size = board.length;
-  let bestMove = null;
-  let bestScore = -Infinity;
 
   for (let row = 0; row < size; row++) {
     for (let col = 0; col < size; col++) {
       if (board[row][col] !== '') continue;
 
-      // Kiểm tra nước đi thắng ngay lập tức
-      if (isWinningMove(board, row, col, 'O')) {
-        return [row, col]; // Ưu tiên đánh thắng ngay
+      board[row][col] = symbol;
+      const isWin = evaluateAttack(board, row, col, symbol) >= 1000;
+      board[row][col] = '';
+
+      if (isWin) return [row, col];
+    }
+  }
+  return null;
+}
+
+function findLineLength(board, symbol, length) {
+  const size = board.length;
+
+  for (let row = 0; row < size; row++) {
+    for (let col = 0; col < size; col++) {
+      if (board[row][col] !== '') continue;
+
+      const directions = [
+        [0, 1],
+        [1, 0],
+        [1, 1],
+        [1, -1],
+      ];
+
+      for (const [dr, dc] of directions) {
+        const count1 = countDirection(board, row, col, dr, dc, symbol);
+        const count2 = countDirection(board, row, col, -dr, -dc, symbol);
+        const openEnds = countOpenEnds(board, row, col, dr, dc, symbol);
+
+        if (count1 + count2 + 1 >= length && openEnds >= 1) {
+          return [row, col];
+        }
+      }
+    }
+  }
+
+  return null;
+}
+
+function findDoubleThreat(board, symbol) {
+  const size = board.length;
+
+  for (let row = 0; row < size; row++) {
+    for (let col = 0; col < size; col++) {
+      if (board[row][col] !== '') continue;
+
+      let threatCount = 0;
+      const directions = [
+        [0, 1],
+        [1, 0],
+        [1, 1],
+        [1, -1],
+      ];
+
+      for (const [dr, dc] of directions) {
+        const count1 = countDirection(board, row, col, dr, dc, symbol);
+        const count2 = countDirection(board, row, col, -dr, -dc, symbol);
+        const openEnds = countOpenEnds(board, row, col, dr, dc, symbol);
+
+        if (count1 + count2 === 2 && openEnds === 2) {
+          threatCount++;
+        }
       }
 
-      // Kiểm tra nước đi nối các đường 3-4 để thắng
-      const potentialWin = evaluatePotentialWin(board, row, col, 'O');
-      if (potentialWin > 0) {
-        return [row, col]; // Ưu tiên nước đi dẫn đến chiến thắng nhanh hơn
-      }
+      if (threatCount >= 2) return [row, col];
+    }
+  }
 
-      // Kiểm tra nước đi chặn đối thủ thắng ngay lập tức
-      if (isWinningMove(board, row, col, 'X')) {
-        return [row, col]; // Ưu tiên chặn đối thủ thắng
-      }
+  return null;
+}
 
-      // Kiểm tra nước đi chặn các đường nguy hiểm của đối thủ
-      const threatLevel = isThreatMove(board, row, col, 'X');
-      if (threatLevel > 0) {
-        return [row, col]; // Ưu tiên chặn nước đi nguy hiểm
-      }
+function countOpenEnds(board, row, col, dr, dc) {
+  let open = 0;
 
-      // Nếu không có nước đi nguy hiểm, tính điểm tấn công/phòng thủ
-      const attackScore = evaluate(board, row, col, 'O') * 1.8; // Tăng trọng số tấn công
-      const defendScore = evaluate(board, row, col, 'X') * 1.5; // Tăng trọng số phòng thủ
-      const nearBonus = isNearExistingMove(board, row, col) ? 10 : 0; // Tăng trọng số gần quân cờ
-      const centerBonus = Math.abs(row - size / 2) + Math.abs(col - size / 2) < size / 4 ? 10 : 0; // Ưu tiên trung tâm
+  const r1 = row + dr;
+  const c1 = col + dc;
+  const r2 = row - dr;
+  const c2 = col - dc;
 
-      // Giảm điểm nếu nước đi gần tường, nhưng chỉ áp dụng nếu không phải nước đi thắng hoặc chặn thắng
-      const wallPenalty = row <= 1 || row >= size - 2 || col <= 1 || col >= size - 2 ? -15 : 0;
+  if (r1 >= 0 && r1 < board.length && c1 >= 0 && c1 < board.length && board[r1][c1] === '') open++;
+  if (r2 >= 0 && r2 < board.length && c2 >= 0 && c2 < board.length && board[r2][c2] === '') open++;
 
-      const moveKey = `${row},${col}`;
-      const historyPenalty = moveHistory.has(moveKey) ? -10 : 0;
+  return open;
+}
 
-      const total = attackScore + defendScore + nearBonus + centerBonus + wallPenalty + historyPenalty;
+function findBestHeuristicMove(board, symbol) {
+  const size = board.length;
+  let bestScore = -Infinity;
+  let bestMove = null;
 
-      if (total > bestScore) {
-        bestScore = total;
+  for (let row = 0; row < size; row++) {
+    for (let col = 0; col < size; col++) {
+      if (board[row][col] !== '') continue;
+
+      const score =
+        evaluateAttack(board, row, col, symbol) +
+        evaluateDefense(board, row, col) +
+        (isNearExistingMove(board, row, col) ? 15 : 0) +
+        (Math.abs(row - size / 2) + Math.abs(col - size / 2) < size / 4 ? 10 : 0);
+
+      if (score > bestScore) {
+        bestScore = score;
         bestMove = [row, col];
       }
     }
   }
 
-  if (bestMove) {
-    moveHistory.add(`${bestMove[0]},${bestMove[1]}`);
-  }
-
   return bestMove || [Math.floor(size / 2), Math.floor(size / 2)];
 }
 
-// Hàm Minimax với Alpha-Beta Pruning
-export function minimax(board, depth, isMaximizing, alpha, beta) {
-  const winner = checkWinner(board);
-  if (winner === 'O') return 100 - depth; // AI thắng
-  if (winner === 'X') return depth - 100; // Đối thủ thắng
-  if (isBoardFull(board)) return 0; // Hòa
-
-  if (depth === 4) return evaluateBoard(board); // Tăng độ sâu lên 4
-
-  if (isMaximizing) {
-    let maxEval = -Infinity;
-    for (let row = 0; row < board.length; row++) {
-      for (let col = 0; col < board[row].length; col++) {
-        if (board[row][col] === '') {
-          board[row][col] = 'O'; // AI đi
-          const evaluation = minimax(board, depth + 1, false, alpha, beta);
-          board[row][col] = ''; // Hoàn tác nước đi
-          maxEval = Math.max(maxEval, evaluation);
-          alpha = Math.max(alpha, evaluation);
-          if (beta <= alpha) break; // Cắt tỉa Alpha-Beta
-        }
-      }
-    }
-    return maxEval;
-  } else {
-    let minEval = Infinity;
-    for (let row = 0; row < board.length; row++) {
-      for (let col = 0; col < board[row].length; col++) {
-        if (board[row][col] === '') {
-          board[row][col] = 'X'; // Đối thủ đi
-          const evaluation = minimax(board, depth + 1, true, alpha, beta);
-          board[row][col] = ''; // Hoàn tác nước đi
-          minEval = Math.min(minEval, evaluation);
-          beta = Math.min(beta, evaluation);
-          if (beta <= alpha) break; // Cắt tỉa Alpha-Beta
-        }
-      }
-    }
-    return minEval;
-  }
-}
-
-// Hàm lưu lịch sử ván đấu
-export function saveGameResult(board, result) {
-  gameHistory.push({ board, result });
-  localStorage.setItem('gameHistory', JSON.stringify(gameHistory));
-}
-
-// Hàm tải lịch sử ván đấu
-export function loadGameHistory() {
-  const savedHistory = localStorage.getItem('gameHistory');
-  if (savedHistory) {
-    return JSON.parse(savedHistory);
-  }
-  return [];
-}
-
-// Hàm phân tích lịch sử ván đấu để điều chỉnh chiến lược
-export function analyzeGameHistory() {
-  const history = loadGameHistory();
-  let attackWeight = 1.6;
-  let defenseWeight = 1.2;
-
-  history.forEach((game) => {
-    if (game.result === 'win') {
-      attackWeight += 0.1; // Tăng trọng số tấn công nếu thắng
-    } else if (game.result === 'lose') {
-      defenseWeight += 0.1; // Tăng trọng số phòng thủ nếu thua
-    }
-  });
-
-  return { attackWeight, defenseWeight };
-}
-
-// Hàm kiểm tra người thắng
-export function checkWinner(board) {
-  for (let row = 0; row < board.length; row++) {
-    for (let col = 0; col < board[row].length; col++) {
-      if (evaluate(board, row, col, 'O') >= 25) return 'O'; // AI thắng
-      if (evaluate(board, row, col, 'X') >= 25) return 'X'; // Đối thủ thắng
-    }
-  }
-  return null; // Không có người thắng
-}
-
-// Hàm kiểm tra bàn cờ đã đầy hay chưa
-export function isBoardFull(board) {
-  for (let row = 0; row < board.length; row++) {
-    for (let col = 0; col < board[row].length; col++) {
-      if (board[row][col] === '') return false;
-    }
-  }
-  return true;
-}
-
-// Hàm kiểm tra nước đi thắng ngay lập tức
-function isWinningMove(board, row, col, symbol) {
-  board[row][col] = symbol; // Tạm thời đặt quân cờ
-  const isWin = evaluate(board, row, col, symbol) >= 25; // 5 quân liên tiếp
-  board[row][col] = ''; // Hoàn tác nước đi
-  return isWin;
-}
-
-// Ưu tiên ô gần quân cờ đã đánh
 function isNearExistingMove(board, row, col) {
-  for (let r = row - 1; r <= row + 1; r++) {
-    for (let c = col - 1; c <= col + 1; c++) {
-      if (r === row && c === col) continue;
+  for (let dr = -1; dr <= 1; dr++) {
+    for (let dc = -1; dc <= 1; dc++) {
+      if (dr === 0 && dc === 0) continue;
+
+      const r = row + dr;
+      const c = col + dc;
+
       if (r >= 0 && r < board.length && c >= 0 && c < board.length) {
         if (board[r][c] !== '') return true;
       }
@@ -182,135 +165,43 @@ function isNearExistingMove(board, row, col) {
   return false;
 }
 
-// Tính điểm dựa vào chuỗi cờ liên tục theo các hướng
-function evaluate(board, row, col, symbol) {
-  return evaluateAttack(board, row, col, symbol) + evaluateDefense(board, row, col, symbol);
-}
-
-// Hàm kiểm tra ô trống ở cuối chuỗi
-function isOpenEnd(board, row, col, dr, dc) {
-  const r = row + dr;
-  const c = col + dc;
-  return r >= 0 && c >= 0 && r < board.length && c < board.length && board[r][c] === '';
-}
-
 function countDirection(board, row, col, dr, dc, symbol) {
   let count = 0;
-  for (let i = 1; i < 5; i++) {
-    const r = row + dr * i;
-    const c = col + dc * i;
-    if (r < 0 || c < 0 || r >= board.length || c >= board.length) break;
-    if (board[r][c] === symbol) count++;
-    else break;
+  let r = row + dr;
+  let c = col + dc;
+
+  while (r >= 0 && r < board.length && c >= 0 && c < board.length && board[r][c] === symbol) {
+    count++;
+    r += dr;
+    c += dc;
   }
+
   return count;
 }
 
 function evaluateAttack(board, row, col, symbol) {
   const directions = [
-    [0, 1], // Horizontal
-    [1, 0], // Vertical
-    [1, 1], // Diagonal (top-left to bottom-right)
-    [1, -1], // Diagonal (top-right to bottom-left)
+    [0, 1],
+    [1, 0],
+    [1, 1],
+    [1, -1],
   ];
   let score = 0;
 
   for (const [dr, dc] of directions) {
     let count = 1;
-    let openEnds = 0;
-
-    // Đếm số quân liên tiếp theo hướng chính
     count += countDirection(board, row, col, dr, dc, symbol);
-    // Đếm số quân liên tiếp theo hướng ngược lại
     count += countDirection(board, row, col, -dr, -dc, symbol);
 
-    // Kiểm tra các ô trống ở hai đầu chuỗi
-    if (isOpenEnd(board, row, col, dr, dc)) openEnds++;
-    if (isOpenEnd(board, row, col, -dr, -dc)) openEnds++;
-
-    // Tăng điểm dựa trên độ dài chuỗi và số ô trống xung quanh
-    if (count >= 5) {
-      score += 1000; // Ưu tiên thắng ngay
-    } else if (count === 4 && openEnds > 0) {
-      score += 800; // Ưu tiên tạo chuỗi 4 quân mở
-    } else if (count === 3 && openEnds > 1) {
-      score += 400; // Ưu tiên tạo chuỗi 3 quân mở
-    } else if (count === 2 && openEnds > 1) {
-      score += 150; // Ưu tiên tạo chuỗi 2 quân mở
-    }
+    if (count >= 5) score += 1000;
+    else if (count === 4) score += 100;
+    else if (count === 3) score += 30;
+    else if (count === 2) score += 10;
   }
 
   return score;
 }
 
-function evaluateDefense(board, row, col, symbol) {
-  const opponent = symbol === 'O' ? 'X' : 'O';
-  return evaluateAttack(board, row, col, opponent); // Phòng thủ dựa trên chiến lược tấn công của đối thủ
-}
-
-function isThreatMove(board, row, col, symbol) {
-  const directions = [
-    [0, 1], // Horizontal
-    [1, 0], // Vertical
-    [1, 1], // Diagonal (top-left to bottom-right)
-    [1, -1], // Diagonal (top-right to bottom-left)
-  ];
-
-  let maxThreatLevel = 0;
-
-  for (const [dr, dc] of directions) {
-    const count1 = countDirection(board, row, col, dr, dc, symbol);
-    const count2 = countDirection(board, row, col, -dr, -dc, symbol);
-
-    // Tính số ô trống ở hai đầu chuỗi
-    const openEnds = (isOpenEnd(board, row, col, dr, dc) ? 1 : 0) + (isOpenEnd(board, row, col, -dr, -dc) ? 1 : 0);
-
-    // Đánh giá mức độ nguy hiểm
-    const threatLevel = count1 + count2; // Tổng số quân liên tiếp
-    if (threatLevel === 3 && openEnds > 0) {
-      maxThreatLevel = Math.max(maxThreatLevel, 3); // Đường 3 quân nguy hiểm
-    } else if (count1 === 2 && count2 === 2) {
-      maxThreatLevel = Math.max(maxThreatLevel, 4); // Combo 2+2 = 5
-    }
-  }
-
-  return maxThreatLevel; // Trả về mức độ nguy hiểm cao nhất
-}
-
-function evaluatePotentialWin(board, row, col, symbol) {
-  const directions = [
-    [0, 1], // Horizontal
-    [1, 0], // Vertical
-    [1, 1], // Diagonal (top-left to bottom-right)
-    [1, -1], // Diagonal (top-right to bottom-left)
-  ];
-
-  for (const [dr, dc] of directions) {
-    const count1 = countDirection(board, row, col, dr, dc, symbol);
-    const count2 = countDirection(board, row, col, -dr, -dc, symbol);
-
-    // Nếu tổng số quân liên tiếp >= 4, nước đi này có thể dẫn đến chiến thắng
-    if (count1 + count2 >= 4) {
-      return 1; // Ưu tiên nước đi này
-    }
-  }
-
-  return 0; // Không có nước đi tiềm năng dẫn đến chiến thắng
-}
-
-// Hàm tính điểm tổng thể của bàn cờ
-function evaluateBoard(board) {
-  let score = 0;
-
-  for (let row = 0; row < board.length; row++) {
-    for (let col = 0; col < board[row].length; col++) {
-      if (board[row][col] === 'O') {
-        score += evaluateAttack(board, row, col, 'O'); // Điểm tấn công của AI
-      } else if (board[row][col] === 'X') {
-        score -= evaluateAttack(board, row, col, 'X'); // Điểm tấn công của đối thủ
-      }
-    }
-  }
-
-  return score;
+function evaluateDefense(board, row, col) {
+  return evaluateAttack(board, row, col, 'X') * 0.8;
 }
